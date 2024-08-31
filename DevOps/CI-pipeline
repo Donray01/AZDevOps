@@ -1,0 +1,23 @@
+trigger: 
+  - None
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+ - task: NodeTool@0
+   displayName: Install Node js
+   inputs:
+    versionSource: 'spec'
+    versionSpec: '21.x'
+        
+ - script: npm install 
+   displayName: To restore the Node module to Total serve App
+       
+ - script: npm run build
+   displayName: Build TotalServe
+        
+ - task: PublishBuildArtifacts@1
+   inputs:
+    pathtoPublish: dist
+    ArtifactName: 'David'
