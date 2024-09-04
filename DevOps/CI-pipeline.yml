@@ -1,0 +1,58 @@
+trigger: 
+  - None
+
+pool:
+  vmImage: ubuntu-latest
+stages:
+ - stage: Build
+   jobs:
+   - job: BuildApp
+     displayName: Build job 
+     steps:
+     - task: NodeTool@0
+       displayName: Install Node js
+       inputs:
+         versionSource: 'spec'
+         versionSpec: '21.x'
+        
+     - script: npm install 
+       displayName: To restore the Node module to Total serve App
+       
+     - script: npm run build
+       displayName: Build TotalServe
+        
+     - task: PublishBuildArtifacts@1
+       inputs:
+         pathtoPublish: dist
+         ArtifactName: 'David'
+
+ - stage: deployment
+   displayName: deployment
+   jobs:
+    - job: deploytoAzure
+      displayName: Deploy to Azure Web App
+      pool:
+        vmImage: windows-latest
+
+      steps: 
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'David'
+          downloadPath: '$(Build.ArtifactStagingDirectory)'
+          displayName: Download TotalServe from Artifact
+
+      - task: AzureRmWebAppDeployment@4
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'Azure subscription 1 (f884818e-0534-47ff-821b-6685cda62c9b)'
+          appType: 'webApp'
+          WebAppName: 'davidPro'
+          packageForLinux: '$(Build.ArtifactStagingDirectory)/David'
+
+        
+        
+
+
+ 
